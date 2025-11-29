@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     BarChart,
     Bar,
@@ -19,24 +19,46 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../atoms/Card";
 import { ChartTypeSelector, ChartType } from "../molecules/ChartTypeSelector";
 import { FilterBar } from "../molecules/FilterBar";
-import { SalesData } from "@/lib/mockData";
+import { SalesData, fetchSalesData } from "@/lib/mockData";
+import { Loader2 } from "lucide-react";
 
 interface SalesChartWidgetProps {
     year: number;
-    data: SalesData[];
+    initialData?: SalesData[]; // Optional initial data
 }
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
 
-export function SalesChartWidget({ year, data }: SalesChartWidgetProps) {
+export function SalesChartWidget({ year, initialData }: SalesChartWidgetProps) {
+    const [data, setData] = useState<SalesData[]>(initialData || []);
+    const [loading, setLoading] = useState(!initialData);
     const [chartType, setChartType] = useState<ChartType>("bar");
     const [threshold, setThreshold] = useState<number>(0);
+
+    useEffect(() => {
+        if (!initialData) {
+            setLoading(true);
+            fetchSalesData(year)
+                .then((fetchedData) => {
+                    setData(fetchedData);
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [year, initialData]);
 
     const filteredData = useMemo(() => {
         return data.filter((item) => item.sales >= threshold);
     }, [data, threshold]);
 
     const renderChart = () => {
+        if (loading) {
+            return (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                </div>
+            );
+        }
+
         if (filteredData.length === 0) {
             return (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">

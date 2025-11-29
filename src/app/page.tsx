@@ -8,11 +8,14 @@ export default function Home() {
   return (
     <DashboardTemplate>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-        <SalesChartWidget year={2024} data={allData[2024]} />
-        <SalesChartWidget year={2023} data={allData[2023]} />
+        {/* Simulating SSR data for 2024 */}
+        <SalesChartWidget year={2024} initialData={allData[2024]} />
+        {/* Simulating Client-side API fetch for 2023 */}
+        <SalesChartWidget year={2023} />
       </div>
       <div className="grid gap-6 md:grid-cols-1">
-        <SalesChartWidget year={2022} data={allData[2022]} />
+        {/* Simulating Client-side API fetch for 2022 */}
+        <SalesChartWidget year={2022} />
       </div>
     </DashboardTemplate>
   );

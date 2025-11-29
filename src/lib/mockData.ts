@@ -31,3 +31,9 @@ export const getAllYearsData = () => {
         2024: getSalesData(2024),
     };
 };
+
+export const fetchSalesData = async (year: number): Promise<SalesData[]> => {
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return getSalesData(year);
+};
