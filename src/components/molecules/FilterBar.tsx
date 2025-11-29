@@ -7,20 +7,24 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ threshold, onThresholdChange }: FilterBarProps) {
-    const [inputValue, setInputValue] = useState(threshold.toString());
+    const [localValue, setLocalValue] = useState(threshold.toString());
 
+    // Debounce the update to the parent to allow smooth typing
     useEffect(() => {
-        setInputValue(threshold.toString());
-    }, [threshold]);
+        const timer = setTimeout(() => {
+            const numValue = parseFloat(localValue);
+            if (!isNaN(numValue)) {
+                onThresholdChange(numValue);
+            } else if (localValue === "") {
+                onThresholdChange(0);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [localValue, onThresholdChange]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setInputValue(value);
-
-        const numValue = Number(value);
-        if (!isNaN(numValue)) {
-            onThresholdChange(numValue);
-        }
+        setLocalValue(e.target.value);
     };
 
     return (
@@ -31,10 +35,11 @@ export function FilterBar({ threshold, onThresholdChange }: FilterBarProps) {
             <Input
                 id="threshold"
                 type="number"
-                value={inputValue}
+                value={localValue}
                 onChange={handleChange}
                 className="w-32"
                 min={0}
+                placeholder="0"
             />
         </div>
     );
