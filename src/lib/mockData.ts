@@ -33,7 +33,9 @@ export const getAllYearsData = () => {
 };
 
 export const fetchSalesData = async (year: number): Promise<SalesData[]> => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return getSalesData(year);
+    const response = await fetch(`/api/sales?year=${year}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch sales data');
+    }
+    return response.json();
 };
